@@ -116,9 +116,12 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 		resynth_e[n] += weight_e[n] * reverse[n];
 		//resynth_i[n] += weight_i[n] * reverse[n];
 	}
-	delete []gOut[chan];
-	delete []hOut[chan];
-	delete []s_hOut[chan];
+	for(chan = 0; chan < NUMBER_CHANNEL; chan++)
+	{
+		delete []gOut[chan];
+		delete []hOut[chan];
+		delete []s_hOut[chan];
+	}
 	//save resynth
 	short *resynth_s;
 	resynth_s = new short[sigLength];

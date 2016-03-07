@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	int nChannel = 1;
 	int nMaxSample = -1;
 	int plen,nlen = -1;
-	int FLag = 0;
+	int FLag,count = 0;
 	int Total_number=0;
 	//START¡¡ALL
 	srand((unsigned)time(0)); 
@@ -89,10 +89,11 @@ int main(int argc, char *argv[])
 		
 		if(strstr(buf,"["))
 		{
-			FLag++;
+			FLag = 0;
+			count++;
 			cout<<FLag<<endl;
 			//cout<<buf<<endl;
-			while(fgets(temp, 1024, fp_purewav))
+			if(fgets(temp, 1024, fp_purewav))
 			{
 				strcpy(name_id, temp);
 				chop(name_id);
@@ -113,34 +114,30 @@ int main(int argc, char *argv[])
 					v_erm.push_back( vector<float> (NUM_CHANNEL));
 				}
 					//cout<<"SS"<<v_erm.size()<<endl;
-				break;
 			}
 		}
 		else 
 		{
-			int i,j;
-			for(i=0; i<numFrame;i++)
-			{ 
-				//cout<<buf<<endl;
-				string aaa(buf);
-				stringstream ss(aaa);
-				for(j=0; j<NUM_CHANNEL; j++)
-				{
-					ss >> v_erm[i][j];
-					//cout<<v_erm.size()<<endl;
-					//cout<<v_erm[i].size()<<endl;
-					cout<<v_erm[i][j]<<endl;
-				}
-				cout<<v_erm[i][NUM_CHANNEL-1]<<endl;
-				//cout<<v_erm[numFrame-1][NUM_CHANNEL-1]<<endl;
-				break;
+			int j;
+			string aaa(buf);
+			stringstream ss(aaa);
+			for(j=0; j<NUM_CHANNEL; j++)
+			{
+				ss >> v_erm[FLag][j];
 			}
-			//cout<<v_erm[numFrame-1][NUM_CHANNEL-1]<<endl;
-			while(v_erm[numFrame-1][NUM_CHANNEL-1]>0)
+			//cout<<v_erm[FLag][NUM_CHANNEL-1]<<endl;
+			FLag++;
+			if(v_erm[numFrame-1][NUM_CHANNEL-1]>0)
 			{
 				cout<<v_erm[numFrame-1][NUM_CHANNEL-1]<<endl;
 				fprintf(Log, "resynth\n ");
 				resynth(&noisywav, opts, v_erm, name_id);
+				for(int i = 0; i < numFrame; i++)
+				{
+					v_erm[i].swap(vector<float>());
+				}
+				v_erm.clear();
+				cout<< count<< endl;
 			}
 		}
 	}
