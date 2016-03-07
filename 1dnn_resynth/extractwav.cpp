@@ -85,39 +85,31 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 		
 		for(n=0; n<sigLength; n++)
 			reverse[sigLength - n - 1] = gOut[chan][n] / fChan[chan].midEarCoeff;
- 
 		gammaToneFilter(reverse, gOut[chan], fChan[chan], sigLength);
-
 		for(n=0; n<sigLength; n++)
 			reverse[sigLength - n - 1] = gOut[chan][n] / fChan[chan].midEarCoeff;
-
 		for(n=0; n<sigLength; n++) 
 		{	
 			weight_e[n] = 0.0;
 		}
-	}
-	for(frame=0; frame<numFrame; frame++)
-	{
-		for(int c=0; c<NUMBER_CHANNEL; c++)
+		for(frame=0; frame<numFrame; frame++)
 		{
-			if(v_erm[frame][c]>0)
+			if(v_erm[frame][chan]>0)
 			{
-				if(frame > 0){
-        				for(n=0; n<OFFSET; n++)
-					weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos(n * PI/(OFFSET) + PI))*v_erm[frame][c];
+				if(frame > 0)
+				{
+        			for(n=0; n<OFFSET; n++)
+						weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos(n * PI/(OFFSET) + PI))*v_erm[frame][chan];
 				}
 				for(long n=OFFSET; n<WINDOW; n++)
-					weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos((n-OFFSET) * PI/(OFFSET)))*v_erm[frame][c];
-			}
+					weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos((n-OFFSET) * PI/(OFFSET)))*v_erm[frame][chan];
+			}		
 		}
-	}
-	for(n=0; n<sigLength; n++)
-	{
-		resynth_e[n] += weight_e[n] * reverse[n];
-		//resynth_i[n] += weight_i[n] * reverse[n];
-	}
-	for(chan = 0; chan < NUMBER_CHANNEL; chan++)
-	{
+		for(n=0; n<sigLength; n++)
+		{
+			resynth_e[n] += weight_e[n] * reverse[n];
+			//resynth_i[n] += weight_i[n] * reverse[n];
+		}
 		delete []gOut[chan];
 		delete []hOut[chan];
 		delete []s_hOut[chan];
