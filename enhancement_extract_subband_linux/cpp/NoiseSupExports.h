@@ -25,7 +25,7 @@
 //	int *pSpeechFoundVADNS;
 //	int *pFrameCounter;
 //};
-#define NUMBER_CHANNEL  25      		        /* maxmimum number of filters ADD_BY_GC_IBM*/
+#define NUMBER_CHANNEL  64      		        /* maxmimum number of filters ADD_BY_GC_IBM*/
 struct mask
 {
 	float mark[NUMBER_CHANNEL];

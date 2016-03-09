@@ -10,9 +10,9 @@
 #define MAX_SIG_LENGTH			150000
 
 
-#define NUMBER_CHANNEL  25      		        /* maxmimum number of filters */
-#define MINCF			80
-#define MAXCF			4000
+#define NUMBER_CHANNEL  64      		        /* maxmimum number of filters */
+#define MINCF			50
+#define MAXCF			8000
 
 #define BW_CORRECTION       1.019      			/* ERB bandwidth correction 4th order */
 

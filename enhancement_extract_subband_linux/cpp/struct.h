@@ -3,7 +3,7 @@
 
 
 #define FILE_LEN 255
-#define NUM_CHANNEL 25
+#define NUM_CHANNEL 64
 	
 typedef struct _FILESNAME
 {
@@ -12,7 +12,10 @@ typedef struct _FILESNAME
 	char purewavlist[FILE_LEN];
 	char noisepath1[FILE_LEN];
 	char noisepath2[FILE_LEN];
+        char noisepath3[FILE_LEN];
+        char noisepath4[FILE_LEN];
 	int  addnoisedB;
+
 	//Output wav
 	char outputDictionary[FILE_LEN];
 	char save_noisy_dir[FILE_LEN];

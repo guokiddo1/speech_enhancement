@@ -66,6 +66,10 @@ int main(int argc, char *argv[])
 	noisewav1.Read(opts.noisepath1, channel, true, type, nFs, nChannel, nMaxSample);
 	CWave noisewav2;
 	noisewav2.Read(opts.noisepath2, channel, true, type, nFs, nChannel, nMaxSample);
+	CWave noisewav3;
+	noisewav3.Read(opts.noisepath3, channel, true, type, nFs, nChannel, nMaxSample);
+	CWave noisewav4;
+	noisewav4.Read(opts.noisepath4, channel, true, type, nFs, nChannel, nMaxSample);
 	cout << "read noise" << endl;
 	//START¡¡ALL
 	srand((unsigned)time(0)); 
@@ -174,6 +178,71 @@ int main(int argc, char *argv[])
 					   }
 					   break;
 			}
+			case 6:{
+					   opts.addnoisedB = 5;
+					   n2 = ( int )(rand_key * (noisewav3.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav3.GetDataPtr();
+					   for (int j = 0; j < len_noise; j++)
+					   {
+						   point_noise[j] = p_noise[n2 + j];
+						   p_noisy[j] = p_pure[j];
+					   }
+					   break;
+			}
+			case 7:{
+					   opts.addnoisedB = 0;
+					   n2 = (int)(rand_key * (noisewav3.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav3.GetDataPtr();
+					   for (int j = 0; j < len_noise; j++)
+					   {
+						   point_noise[j] = p_noise[n2 + j];
+						   p_noisy[j] = p_pure[j];
+					   }
+					   break;
+			}
+			case 8:{
+					   opts.addnoisedB = -5;
+					   n2 = (int)(rand_key * (noisewav3.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav3.GetDataPtr();
+					   for (int j = 0; j < len_noise; j++)
+					   {
+						   point_noise[j] = p_noise[n2 + j];
+						   p_noisy[j] = p_pure[j];
+					   }
+					   break;
+			}
+			case 9:{
+					   opts.addnoisedB = 5;
+					   n2 = (int)(rand_key * (noisewav4.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav4.GetDataPtr();
+					   for (int j = 0; j < len_noise; j++)
+					   {
+						   point_noise[j] = p_noise[n2 + j];
+						   p_noisy[j] = p_pure[j];
+					   }
+					   break;
+			}
+			case 10:{
+					   opts.addnoisedB = 0;
+					   n2 = (int)(rand_key * (noisewav4.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav4.GetDataPtr();
+					   for (int j = 0; j < len_noise; j++)
+					   {
+						   point_noise[j] = p_noise[n2 + j];
+						   p_noisy[j] = p_pure[j];
+					   }
+					   break;
+			}
+			case 11:{
+					   opts.addnoisedB = -5;
+					   n2 = (int)(rand_key * (noisewav4.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav4.GetDataPtr();
+					   for (int j = 0; j < len_noise; j++)
+					   {
+						   point_noise[j] = p_noise[n2 + j];
+						   p_noisy[j] = p_pure[j];
+					   }
+					   break;
 			default:
 				break;
 		}
@@ -219,11 +288,14 @@ int main(int argc, char *argv[])
 		//fprintf(Log, "IBM & IRM\n ");
 		//cout<<"IBM & IRM"<<endl;
 		//makeIBM(name_id, opts);
+		FILE *fp_IRM_W = NULL;
+		sprintf( temp, "%sIRM.sIRM",opts.outputDictionary);
+		fp_IRM_W = fopen(temp, "at+");
 		if (test)
 		{
 			fprintf(Log, "single_IBM\n ");
 			cout << "single_IBM" << endl;
-			make_single_IBM(name_id, opts);
+			make_single_IBM(name_id, fp_IRM_W, opts);
 			/*
 			****************FEATURE*********************
 			*/
@@ -235,6 +307,7 @@ int main(int argc, char *argv[])
 			//extract_Wiener(name_id, opts);
 
 		}
+		fclose( fp_IRM_W );
 	}
 	fclose(fp_purewav);
 	fclose(Log);
@@ -275,6 +348,12 @@ void Read_CFG(char *Cfg_File, FILESNAME &opts)
 	fgets(Char_temp, 1024, fp);
 	chop(Char_temp);
 	sscanf(Char_temp, "%s %s", tmp0, opts.noisepath2);
+	fgets(Char_temp, 1024, fp);
+	chop(Char_temp);
+	sscanf(Char_temp, "%s %s", tmp0, opts.noisepath3);
+	fgets(Char_temp, 1024, fp);
+	chop(Char_temp);
+	sscanf(Char_temp, "%s %s", tmp0, opts.noisepath4);
 	//addnoisedB= 5
 	fgets(Char_temp, 1024, fp);
 	chop(Char_temp);
