@@ -243,6 +243,7 @@ int main(int argc, char *argv[])
 						   p_noisy[j] = p_pure[j];
 					   }
 					   break;
+				}
 			default:
 				break;
 		}
