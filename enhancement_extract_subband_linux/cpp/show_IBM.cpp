@@ -111,7 +111,7 @@ void make_single_IBM(char *name_id,FILE *fp_IRM_W, FILESNAME opts)
 	float **all_IRM = new float *[NUMBER_CHANNEL];
 	for(int k = 0 ; k < NUMBER_CHANNEL; k++)
 	{
-		all_IRM[k] = new float[buffNum+1];
+		all_IRM[k] = new float[buffNum];
 	}
 	for(int subband = 0 ; subband < NUM_CHANNEL ; subband++ )
 	{
@@ -198,11 +198,6 @@ void make_single_IBM(char *name_id,FILE *fp_IRM_W, FILESNAME opts)
 		}
 		fprintf(fp_IRM_W, "\n ");
 			
-	}
-	for(int subband=0; subband<NUMBER_CHANNEL; subband++)
-	{
-		all_IRM[subband][buffNum] = 0;
-		fprintf(fp_IRM_W, "%.7f ", all_IRM[subband][buffNum]);
 	}
 	fprintf(fp_IRM_W,"]\n");
 	//fclose(fp_IRM_W);

@@ -98,9 +98,9 @@ int main(int argc, char *argv[])
 		purewav.Read(purewav_name, channel, true, type, nFs, nChannel, nMaxSample);
 		//temp noise wav
 		int  len_noise = purewav.GetSampleNum();
-		rand_key =  rand() % 10001 / 10000.0;
+		rand_key =  rand() % 20 / 20.0;
 		
-		n1 = (int)(rand_key * 6);
+		n1 = (int)(rand_key * 12);
 		cout << n1 << endl;
 		short *point_noise;
 		short *p_noisy;
@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
 		p_noisy = new short[len_noise];
 		point_noise = new short[len_noise];
 		p_pure = purewav.GetDataPtr();
+		rand_key =  rand() % 20/ 20.0;
 		switch (n1)
 		{
 			case 0:{
