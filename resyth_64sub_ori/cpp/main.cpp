@@ -170,6 +170,10 @@ void Read_CFG(char *Cfg_File, FILESNAME &opts)
 	fgets(Char_temp, 1024, fp);
 	chop(Char_temp);
 	sscanf(Char_temp, "%s %s", tmp0, opts.purewavlist);
+	//numMix= 
+	fgets(Char_temp, 1024, fp);
+	chop(Char_temp);
+	sscanf(Char_temp, "%s %d", tmp0, &opts.numMix);
 	
 	/*
 	**********************OUTPUT**************************

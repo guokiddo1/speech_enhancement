@@ -9,6 +9,7 @@ typedef struct _FILESNAME
 {
 	char purewavDictionary[FILE_LEN];
 	char purewavlist[FILE_LEN];
+	int numMix;
 	
 	//Output wav
 	char outputDictionary[FILE_LEN];

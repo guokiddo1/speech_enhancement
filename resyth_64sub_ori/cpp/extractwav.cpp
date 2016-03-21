@@ -2,10 +2,10 @@
 #include "HuWang.h"
 #include "cmath"
 #include <vector>
-#include<iostream>
-#include<fstream>
-using namespace asdk;
+#include <iostream>
+#include <fstream>
 using namespace std;
+using namespace asdk;
 void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* name_id)
 {
 	int n=0;
@@ -66,23 +66,67 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 	int frame = 0;
 	int numFrame =  sigLength/OFFSET;
 
-	float *resynth_e,*weight_e,*reverse;//,*resynth_i,*weight_i;
+	float *resynth_e,*weight_e,*reverse;//
 	resynth_e = new float[sigLength];
 	weight_e = new float[sigLength];
 	//resynth_i = new float[sigLength];
 	//weight_i = new float[sigLength];
 	reverse = new float[sigLength];
-
 	for(n=0; n<sigLength; n++)
 	{
-		resynth_e[n]=0;
+		resynth_e[n] = 0;
 		//resynth_i[n]=0;
 	}
-	//cout<<"******1******"<<endl;
 	
+ 	float thd = 0.0;	
+	int *noise_frame, *noise_estimate;
+	int num_noise_frame = 0;
+	noise_frame = new int[numFrame];
+	noise_estimate = new int[numFrame];
+
+	float *data_each_frame, *spec_mag, *noise_data_each_frame, *noise_spec_mag;
+	complex<double> *spec_angle, *noise_spec_angle;
+	float *denoise_data;
+
+	spec_mag = new float[WINDOW];
+	noise_spec_mag = new float[WINDOW];
+	spec_angle = new complex<double>[WINDOW];
+	noise_spec_angle = new complex<double>[WINDOW];
+	denoise_data = new float[WINDOW];
+
 	for(chan=0; chan<NUMBER_CHANNEL; chan++)
 	{
+		// Train erm thd for each channal
+		thd = Train_thd( opts.numMix, v_erm, numFrame, chan);
+		cout<< "thd for " << chan << " channal = "<< thd<<endl;
 		
+		// noise_frame[] have the noise_frame_idx
+		num_noise_frame = 0;
+		for(frame = 0 ; frame < numFrame ; frame ++)
+		{
+			if( v_erm[frame][chan] <= thd )
+			{
+				noise_frame[num_noise_frame] = frame;
+				num_noise_frame++;
+			}
+		}
+
+		//noise estimate for each frame
+		int noise_index = 0;
+		for(frame = 0 ; frame < numFrame ; frame ++)
+		{
+			if( v_erm[frame][chan] > thd )
+			{
+				noise_estimate[frame] = noise_frame[noise_index];
+			}
+			else
+			{
+				noise_estimate[frame] = noise_frame[noise_index];
+				noise_index++;
+			}
+		}
+		
+		//get reverse subband_noisy
 		for(n=0; n<sigLength; n++)
 			reverse[sigLength - n - 1] = gOut[chan][n] / fChan[chan].midEarCoeff;
 		gammaToneFilter(reverse, gOut[chan], fChan[chan], sigLength);
@@ -92,23 +136,30 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 		{	
 			weight_e[n] = 0.0;
 		}
+		
+		
 		for(frame=0; frame<numFrame; frame++)
 		{
-			if(v_erm[frame][chan]>0.25)
+			if(v_erm[frame][chan]> thd)
 			{
 				if(frame > 0)
 				{
-        			for(n=0; n<OFFSET; n++)
-						weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos(n * PI/(OFFSET) + PI))*v_erm[frame][chan];
+	        			for(n=0; n<OFFSET; n++)
+						weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos(n * PI/(OFFSET) + PI));
 				}
 				for(long n=OFFSET; n<WINDOW; n++)
-					weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos((n-OFFSET) * PI/(OFFSET)))*v_erm[frame][chan];
-			}		
-		}
-		for(n=0; n<sigLength; n++)
-		{
-			resynth_e[n] += weight_e[n] * reverse[n];
-			//resynth_i[n] += weight_i[n] * reverse[n];
+					weight_e[(frame-1)*OFFSET + n] += 0.5 * (1.0 + cos((n-OFFSET) * PI/(OFFSET)));
+
+				//fft for each frame
+				fft( &reverse[frame * OFFSET],  WINDOW, spec_mag, spec_angle);
+				fft( &reverse[noise_estimate[frame] * OFFSET], WINDOW, noise_spec_mag, noise_spec_angle);
+				spec_minus(spec_mag, noise_spec_mag, WINDOW);
+				ifft(spec_mag, spec_angle, OFFSET, denoise_data);
+
+	        		for(long n=0; n<OFFSET; n++)
+					resynth_e[(frame-1)*OFFSET + n] += weight_e[(frame-1) * OFFSET + n] * denoise_data[n];
+			}
+			
 		}
 		delete []gOut[chan];
 		delete []hOut[chan];
@@ -122,6 +173,13 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 	CWave resynth_wav_e(resynth_s, sigLength, wav->GetFs());
 	sprintf(temp,"%s%s%s_e_resynth.wav",opts.outputDictionary,opts.save_resynth_e_dir, name_id);
 	resynth_wav_e.Write(temp);
+
+	delete []noise_frame;
+	delete []noise_estimate;
+	delete []spec_mag;
+	delete []noise_spec_mag;
+	delete []spec_angle;
+	delete []noise_spec_angle;
 	delete []resynth_s;
 	delete []resynth_e;
 	delete []weight_e;
@@ -275,4 +333,104 @@ float loudnessLevelInPhons(float freq, middleEar lF)
 	tfy	= lF.tf[i-1] + ratio * (lF.tf[i] - lF.tf[i-1]);
 	
 	return(4.2 + afy*(DB - tfy) / (1.0 + bfy*(DB - tfy)) );
+}
+float Train_thd(int numMix, vector<vector<float> > &v_erm, int numFrame, int chan)
+{
+		
+  		double *snr_sub;
+		snr_sub = new double[numFrame];
+		
+		double mean,var, thd = 0;
+		double mix_thd, mix_mean, mix_var = 0.0;
+		int idx,frame = 0;
+		for( frame = 0 ; frame < numFrame; frame++)
+		{
+			snr_sub[frame] = v_erm[frame][chan]/(1-v_erm[frame][chan]);	
+			mean += snr_sub[frame];
+
+		}
+		mean = mean / numFrame;
+		
+		for( frame = 0 ; frame < numFrame; frame++)
+		{
+			var += (snr_sub[frame] - mean) * (snr_sub[frame] - mean);
+		}
+		var = sqrt( var / numFrame); 
+
+		for( frame = 0 ; frame < numFrame; frame++)
+		{
+			snr_sub[frame] = (snr_sub[frame] - mean) / var ;
+		}
+		GMM *gmm = new GMM(1,numMix);
+		gmm->Train( snr_sub, numFrame);
+		for(int i = 0; i < numMix; i++ )
+		{
+			if (gmm->Mean(i)[0] > mix_mean)
+			{
+				idx = i;
+				mix_mean = gmm->Mean(i)[0];
+				mix_var = gmm->Variance(i)[0];
+
+			}
+		}
+		mix_thd = mix_mean - mix_var;
+		thd = ( mix_thd + mean ) * var;
+		if( thd > 0)
+			return (float)(thd / (1 + thd));
+		
+		else
+			return 0.0;
+
+}
+
+void fft(float *data_each_frame,  int len, float *spec_mag, complex<double> *spec_angle)
+{
+	complex<double> *data,*spec;
+	data = new complex<double>[len];
+	spec = new complex<double>[len];
+	for(int i = 0; i < len; i++)
+	{
+		data[i].real() = data_each_frame[i];
+		data[i].imag() = 0;
+	}
+	discreteFourierFast(data, len, spec, ftdFunctionToSpectrum);
+	for(int i=0; i < len ; i++ )
+	{
+		spec_mag[i] = (spec[i].real() * spec[i].real()  + spec[i].imag() * spec[i].imag());
+		spec_angle[i].real() = spec[i].real() / sqrt(spec_mag[i]);
+		spec_angle[i].imag() = spec[i].imag() / sqrt(spec_mag[i]);
+	}
+	delete[] data;
+	delete[] spec;
+}
+void spec_minus(float *spec_mag, float *noise_spec_mag, int len)
+{
+	for(int i = 0 ; i < len ; i++ )
+	{
+		spec_mag[i] = spec_mag[i] - noise_spec_mag[i];
+		if(spec_mag[i] < 0)
+		{
+			spec_mag[i] = 0;
+		}
+	}
+	
+}
+void ifft(float *spec_mag, complex<double> *spec_angle, int len, float *denoise_data)
+{
+	complex<double> *data,*spec;
+	data = new complex<double>[len];
+	spec = new complex<double>[len];
+	for(int i=0; i < len ; i++ )
+	{
+		spec[i].real() = spec_angle[i].real() * sqrt(spec_mag[i]);
+		spec[i].imag() = spec_angle[i].imag() * sqrt(spec_mag[i]);
+	}
+	discreteFourierFast(spec, len, data, ftdSpectrumToFunction);
+	for(int i = 0; i < len; i++)
+	{
+		denoise_data[i] = data[i].real();
+	}
+	delete[] data;
+	delete[] spec;
+	
 }
