@@ -11,7 +11,7 @@
 
 
 #define NUMBER_CHANNEL  64      		        /* maxmimum number of filters */
-#define MINCF			80
+#define MINCF			50
 #define MAXCF			8000
 
 #define BW_CORRECTION       1.019      			/* ERB bandwidth correction 4th order */
@@ -66,7 +66,7 @@ void hairCell(float *input, float *output, long sigLength); // Meddis' auditory 
 
 #define	MAX_DELAY	(SAMPLING_FREQUENCY/80+1)		/* corresponds to 80 Hz */
 #define MIN_DELAY	(SAMPLING_FREQUENCY/500)		/* get ratio from 2 ms delay */
-#define WINDOW	    (SAMPLING_FREQUENCY/40)		/* use a window of 25 ms */
+#define WINDOW	    (SAMPLING_FREQUENCY/50)		/* use a window of 20 ms */
 #define OFFSET		(SAMPLING_FREQUENCY/100)					/* compute acf every 10 ms */
 
 #define PASSBAND	1000 // Passband for the lowpass filter

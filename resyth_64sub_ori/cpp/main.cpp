@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 				noisywav.Read(purewav_name, channel, true, type, nFs, nChannel, nMaxSample);
 				int sigLength;
 				sigLength = noisywav.GetSampleNum();
-				numFrame =  sigLength/OFFSET;
+				numFrame = (sigLength - WINDOW)/OFFSET + 1;
 				cout<<numFrame<<endl;
 				for(int i=0; i<numFrame; i++)
 				{
