@@ -64,7 +64,7 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 	}
 	char temp[FILE_LEN],temp2[FILE_LEN];
 	int frame = 0;
-	int numFrame =  sigLength/OFFSET;
+	int numFrame =  (sigLength - WINDOW)/OFFSET +1;
 
 	float *resynth_e,*weight_e,*reverse;//,*resynth_i,*weight_i;
 	resynth_e = new float[sigLength];
@@ -78,7 +78,7 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 		resynth_e[n]=0;
 		//resynth_i[n]=0;
 	}
-	//cout<<"******1******"<<endl;
+	cout<<"******1******"<<endl;
 	
 	for(chan=0; chan<NUMBER_CHANNEL; chan++)
 	{
@@ -94,7 +94,7 @@ void resynth(CWave *wav,FILESNAME opts, vector<vector<float> > &v_erm, char* nam
 		}
 		for(frame=0; frame<numFrame; frame++)
 		{
-			if(v_erm[frame][chan]>0.25)
+			if(v_erm[frame][chan]>0)
 			{
 				if(frame > 0)
 				{

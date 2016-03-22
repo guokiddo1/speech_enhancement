@@ -12,8 +12,8 @@ typedef struct _FILESNAME
 	char purewavlist[FILE_LEN];
 	char noisepath1[FILE_LEN];
 	char noisepath2[FILE_LEN];
-        char noisepath3[FILE_LEN];
-        char noisepath4[FILE_LEN];
+    char noisepath3[FILE_LEN];
+    char noisepath4[FILE_LEN];
 	int  addnoisedB;
 
 	//Output wav
@@ -25,7 +25,7 @@ typedef struct _FILESNAME
 	//Mask
 	char save_subband_noisy_IBM_dir[FILE_LEN];
 	char save_subband_noisy_IRM_dir[FILE_LEN];
-	char save_subband_noisy_single_IBM_dir[FILE_LEN];
+	char save_subband_noisy_single_IRM_dir[FILE_LEN];
 	//feature
 	char save_subband_noisy_MFCC[FILE_LEN];
 	char save_subband_noisy_ACF[FILE_LEN];

@@ -83,7 +83,6 @@ int main(int argc, char *argv[])
 	erm = fopen(temp1,"r");
 	char buf[64*15];
 	vector<vector<float> > v_erm;
-	vector<float> (NUM_CHANNEL) sub_sheld;
 	while(fgets(buf,sizeof(buf),erm))
 	{
 		int numFrame;
@@ -108,7 +107,7 @@ int main(int argc, char *argv[])
 				noisywav.Read(purewav_name, channel, true, type, nFs, nChannel, nMaxSample);
 				int sigLength;
 				sigLength = noisywav.GetSampleNum();
-				numFrame =  sigLength/OFFSET;
+				numFrame =  (sigLength - WINDOW)/OFFSET +1 ;
 				cout<<numFrame<<endl;
 				for(int i=0; i<numFrame; i++)
 				{
@@ -131,8 +130,7 @@ int main(int argc, char *argv[])
 			//if(v_erm[numFrame-2][NUM_CHANNEL-1]>0)
 			if(FLag == numFrame)
 			{
-				noise_sheld(v_erm, &sub_sheld);
-				cout<<v_erm[numFrame-2][NUM_CHANNEL-1]<<endl;
+				cout<<v_erm[numFrame-1][NUM_CHANNEL-1]<<endl;
 				fprintf(Log, "resynth\n ");
 				resynth(&noisywav, opts, v_erm, name_id);
 				for(int i = 0; i < numFrame; i++)

@@ -27,13 +27,15 @@
 		07-May-2015
 	**********************************
 */
-#include "iostream"
-#include "Wave.h"
+
 #include "stdlib.h"
 #include "struct.h"
+#include "Wave.h"
 #include "extractwav.h"
 #include "make_IBM.h"
 #include <ctime>
+#include "iostream"
+
 using namespace std;
 using namespace asdk;
 
@@ -50,13 +52,14 @@ int main(int argc, char *argv[])
 	//read cfg
 	Read_CFG(cfg,opts);
 	FILE *Log =  NULL;
+	
 	sprintf(temp,"%s%s",opts.outputDictionary,opts.Log);
 	Log = fopen(temp, "a+");
 	//wav cfg
 	CWave::Channel channel=CWave::LEFT_CHANNEL;
 	bool bHead = true;
 	CWave::Type type = CWave::PCM;
-	int nFs = 8000;
+	int nFs = 16000;
 	int nChannel = 1;
 	int nMaxSample = -1;
 	int plen,nlen = -1;
@@ -76,6 +79,7 @@ int main(int argc, char *argv[])
 	FILE *fp_purewav = NULL;
 	cout << "open purewave_list" << endl;
 	fp_purewav = fopen(opts.purewavlist, "r");
+
 	CWave purewav;
 	srand((int)time(0));
 	float rand_key = 0.0;
@@ -98,10 +102,10 @@ int main(int argc, char *argv[])
 		purewav.Read(purewav_name, channel, true, type, nFs, nChannel, nMaxSample);
 		//temp noise wav
 		int  len_noise = purewav.GetSampleNum();
-		rand_key =  rand() % 20 / 20.0;
+	    rand_key =  rand() % 20 / 20.0;
 		
-		n1 = (int)(rand_key * 12);
-		cout << n1 << endl;
+		n1 = (int)(rand_key * 8);
+        cout << n1 << endl;
 		short *point_noise;
 		short *p_noisy;
 		short *p_noise;
@@ -110,12 +114,12 @@ int main(int argc, char *argv[])
 		p_noisy = new short[len_noise];
 		point_noise = new short[len_noise];
 		p_pure = purewav.GetDataPtr();
-		rand_key =  rand() % 20/ 20.0;
+	    rand_key =  rand() % 20 / 20.0;
 		switch (n1)
 		{
 			case 0:{
-					   opts.addnoisedB = 5;
-					   n2 = ( int )(rand_key * (noisewav1.GetSampleNum() - purewav.GetSampleNum()));
+					   opts.addnoisedB = 0;
+					   n2 = (int)(rand_key * (noisewav1.GetSampleNum() - purewav.GetSampleNum()));
 					   p_noise = noisewav1.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
 					   {
@@ -125,7 +129,7 @@ int main(int argc, char *argv[])
 					   break;
 			}
 			case 1:{
-					   opts.addnoisedB = 0;
+					   opts.addnoisedB = -5;
 					   n2 = (int)(rand_key * (noisewav1.GetSampleNum() - purewav.GetSampleNum()));
 					   p_noise = noisewav1.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
@@ -136,9 +140,9 @@ int main(int argc, char *argv[])
 					   break;
 			}
 			case 2:{
-					   opts.addnoisedB = -5;
-					   n2 = (int)(rand_key * (noisewav1.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav1.GetDataPtr();
+					   opts.addnoisedB = 0;
+					   n2 = (int)(rand_key * (noisewav2.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav2.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
 					   {
 						   point_noise[j] = p_noise[n2 + j];
@@ -147,7 +151,7 @@ int main(int argc, char *argv[])
 					   break;
 			}
 			case 3:{
-					   opts.addnoisedB = 5;
+					   opts.addnoisedB = -5;
 					   n2 = (int)(rand_key * (noisewav2.GetSampleNum() - purewav.GetSampleNum()));
 					   p_noise = noisewav2.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
@@ -158,9 +162,9 @@ int main(int argc, char *argv[])
 					   break;
 			}
 			case 4:{
-					   opts.addnoisedB = 0;
+					   opts.addnoisedB = -5;
 					   n2 = (int)(rand_key * (noisewav2.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav2.GetDataPtr();
+					   p_noise = noisewav3.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
 					   {
 						   point_noise[j] = p_noise[n2 + j];
@@ -169,9 +173,9 @@ int main(int argc, char *argv[])
 					   break;
 			}
 			case 5:{
-					   opts.addnoisedB = -5;
+					   opts.addnoisedB = 0;
 					   n2 = (int)(rand_key * (noisewav2.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav2.GetDataPtr();
+					   p_noise = noisewav3.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
 					   {
 						   point_noise[j] = p_noise[n2 + j];
@@ -180,9 +184,9 @@ int main(int argc, char *argv[])
 					   break;
 			}
 			case 6:{
-					   opts.addnoisedB = 5;
-					   n2 = ( int )(rand_key * (noisewav3.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav3.GetDataPtr();
+					   opts.addnoisedB = -5;
+					   n2 = (int)(rand_key * (noisewav2.GetSampleNum() - purewav.GetSampleNum()));
+					   p_noise = noisewav4.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
 					   {
 						   point_noise[j] = p_noise[n2 + j];
@@ -192,29 +196,7 @@ int main(int argc, char *argv[])
 			}
 			case 7:{
 					   opts.addnoisedB = 0;
-					   n2 = (int)(rand_key * (noisewav3.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav3.GetDataPtr();
-					   for (int j = 0; j < len_noise; j++)
-					   {
-						   point_noise[j] = p_noise[n2 + j];
-						   p_noisy[j] = p_pure[j];
-					   }
-					   break;
-			}
-			case 8:{
-					   opts.addnoisedB = -5;
-					   n2 = (int)(rand_key * (noisewav3.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav3.GetDataPtr();
-					   for (int j = 0; j < len_noise; j++)
-					   {
-						   point_noise[j] = p_noise[n2 + j];
-						   p_noisy[j] = p_pure[j];
-					   }
-					   break;
-			}
-			case 9:{
-					   opts.addnoisedB = 5;
-					   n2 = (int)(rand_key * (noisewav4.GetSampleNum() - purewav.GetSampleNum()));
+					   n2 = (int)(rand_key * (noisewav2.GetSampleNum() - purewav.GetSampleNum()));
 					   p_noise = noisewav4.GetDataPtr();
 					   for (int j = 0; j < len_noise; j++)
 					   {
@@ -223,28 +205,6 @@ int main(int argc, char *argv[])
 					   }
 					   break;
 			}
-			case 10:{
-					   opts.addnoisedB = 0;
-					   n2 = (int)(rand_key * (noisewav4.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav4.GetDataPtr();
-					   for (int j = 0; j < len_noise; j++)
-					   {
-						   point_noise[j] = p_noise[n2 + j];
-						   p_noisy[j] = p_pure[j];
-					   }
-					   break;
-			}
-			case 11:{
-					   opts.addnoisedB = -5;
-					   n2 = (int)(rand_key * (noisewav4.GetSampleNum() - purewav.GetSampleNum()));
-					   p_noise = noisewav4.GetDataPtr();
-					   for (int j = 0; j < len_noise; j++)
-					   {
-						   point_noise[j] = p_noise[n2 + j];
-						   p_noisy[j] = p_pure[j];
-					   }
-					   break;
-				}
 			default:
 				break;
 		}
@@ -291,10 +251,11 @@ int main(int argc, char *argv[])
 		//cout<<"IBM & IRM"<<endl;
 		//makeIBM(name_id, opts);
 		FILE *fp_IRM_W = NULL;
-		sprintf( temp, "%sIRM.sIRM",opts.outputDictionary);
+		sprintf(temp,"%sIRM.sIRM",opts.outputDictionary);
 		fp_IRM_W = fopen(temp, "at+");
 		if (test)
 		{
+			
 			fprintf(Log, "single_IBM\n ");
 			cout << "single_IBM" << endl;
 			make_single_IBM(name_id, fp_IRM_W, opts);
@@ -307,10 +268,11 @@ int main(int argc, char *argv[])
 			//cout<<"Wiener fea"<<endl;
 			//fprintf(Log, "Wiener fea\n ");
 			//extract_Wiener(name_id, opts);
-
+			
 		}
-		fclose( fp_IRM_W );
+		fclose(fp_IRM_W);
 	}
+	
 	fclose(fp_purewav);
 	fclose(Log);
 	return 1;
@@ -391,6 +353,7 @@ void Read_CFG(char *Cfg_File, FILESNAME &opts)
 	/*
 	**********************MASK**************************
 	*/
+	
 	//save_subband_noisy_IBM_dir
 	fgets(Char_temp, 1024, fp);
 	chop(Char_temp);
@@ -400,11 +363,12 @@ void Read_CFG(char *Cfg_File, FILESNAME &opts)
 	fgets(Char_temp, 1024, fp);
 	chop(Char_temp);
 	sscanf(Char_temp, "%s %s", tmp0, opts.save_subband_noisy_IRM_dir);
+	
 
 	//save_subband_noisy_sIBM_dir
 	fgets(Char_temp, 1024, fp);
 	chop(Char_temp);
-	sscanf(Char_temp, "%s %s", tmp0, opts.save_subband_noisy_single_IBM_dir);
+	sscanf(Char_temp, "%s %s", tmp0, opts.save_subband_noisy_single_IRM_dir);
 
 	/*
 	**********************FEAT**************************

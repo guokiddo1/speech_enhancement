@@ -1,10 +1,12 @@
+
 #include "make_IBM.h"
 using namespace asdk;
+
 
 void makeIBM(char *name_id, FILESNAME opts)
 {
 	//wav cfg
-	CWave::Channel channel = CWave::LEFT_CHANNEL;
+	CWave::Channel channel=CWave::LEFT_CHANNEL;
 	bool bHead = true;
 	CWave::Type type = CWave::PCM;
 	int nFs = 16000;
@@ -151,7 +153,7 @@ void make_single_IBM(char *name_id,FILE *fp_IRM_W, FILESNAME opts)
 			sum_noise = 0;
 			sum_pure = 0;
 			//snr = 0;
-			for(int j = 0 ; j < NUMBER_CHANNEL ; j++ )
+			for(int j = 0 ; j < specpure.m_nFFT/2; j++ )
 			{
 				sum_noise += specnoise.m_pPowerSpec[i][j];
 				sum_pure += specpure.m_pPowerSpec[i][j];
@@ -188,9 +190,10 @@ void make_single_IBM(char *name_id,FILE *fp_IRM_W, FILESNAME opts)
 	}
 	
 	//sprintf(temp,"%s%s%s.sIRM",opts.outputDictionary, opts.save_subband_noisy_single_IRM_dir,name_id);
-	//fp_IRM_W = fopen(temp, "w");	
-	fprintf(fp_IRM_W,"%s [\n",name_id);
-	for (int frame=0; frame<buffNum; frame++)
+	//fp_IRM_W = fopen(temp, "w");
+    sprintf(temp,"%s_noisy",name_id);
+	fprintf(fp_IRM_W,"%s [\n",temp);
+	for (int frame=0; frame<buffNum -1; frame++)
 	{
 		for(int subband=0; subband<NUMBER_CHANNEL; subband++)
 		{
@@ -198,6 +201,10 @@ void make_single_IBM(char *name_id,FILE *fp_IRM_W, FILESNAME opts)
 		}
 		fprintf(fp_IRM_W, "\n ");
 			
+	}
+	for(int subband=0; subband<NUMBER_CHANNEL; subband++)
+	{
+		fprintf(fp_IRM_W, "%.7f ", all_IRM[subband][buffNum -1]);
 	}
 	fprintf(fp_IRM_W,"]\n");
 	//fclose(fp_IRM_W);
