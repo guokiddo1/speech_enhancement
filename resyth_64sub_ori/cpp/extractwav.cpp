@@ -93,7 +93,6 @@ void resynth(CWave *wav,FILESNAME opts, const vector<vector<float> > &v_erm, cha
 	spec_angle = new complex<double>[512];
 	noise_spec_angle = new complex<double>[512];
 	denoise_data = new float[WINDOW];
-
 	for(chan=0; chan<NUMBER_CHANNEL; chan++)
 	{
 		// Train erm thd for each channal
@@ -353,17 +352,20 @@ float Train_thd(int numMix, const  vector<vector<float> > &v_erm, int numFrame, 
   		double *snr_sub;
 		snr_sub = new double[numFrame];
 		
-		double mean,var, thd = 0.0;
-		mean =0;
-		var = 0;
-		double mix_thd,  mix_var = 0.0;
+		double mean , var , thd ;
+		mean =0; var = 0;thd = 0;
+		double mix_thd , mix_var ;
+		mix_thd = 0;mix_var =0;
 		double mix_mean = 0.0;
-		int idx,frame = 0;
+		int idx , frame;
+		idx = 0;frame = 0;
 		for( frame = 0 ; frame < numFrame; frame++)
 		{
-			snr_sub[frame] = v_erm[frame][chan]/(1.0 - v_erm[frame][chan]);	
+			if(v_erm[frame][chan] != 1.0)
+				snr_sub[frame] = v_erm[frame][chan]/(1.0 - v_erm[frame][chan]);	
+			else
+				snr_sub[frame] = 999.9;
 			mean += snr_sub[frame];
-
 		}
 		mean = mean * 1.0 / numFrame;
 		
@@ -371,7 +373,7 @@ float Train_thd(int numMix, const  vector<vector<float> > &v_erm, int numFrame, 
 		{
 			var += (snr_sub[frame] - mean) * (snr_sub[frame] - mean);
 		}
-		var = sqrt( var / numFrame); 
+		var = sqrt( var / numFrame);
 
 		for( frame = 0 ; frame < numFrame; frame++)
 		{
@@ -409,10 +411,12 @@ float Train_thd(int numMix, const  vector<vector<float> > &v_erm, int numFrame, 
 		}	
 		mix_thd = mix_mean -  mix_var;
 		thd =  mix_thd  * var  + mean;
-		cout<< mean <<","<<mix_mean<<","<<mix_var <<endl;
+		cout<< mean <<"," << var << "," <<mix_mean<<","<<mix_var <<endl;
 		delete []snr_sub;
 		float thd_erm = thd / (1+thd);
-		if( thd_erm > 0)
+		if( thd_erm > 1)
+			return 1;
+		else if (thd_erm > 0)
 			return thd_erm;
 		else
 			return 0.0;

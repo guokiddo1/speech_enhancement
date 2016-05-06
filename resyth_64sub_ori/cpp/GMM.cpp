@@ -60,7 +60,9 @@ for (i=0; i<NumData; i++)    // Reading data
       Feature[i][j] = data[i*DIM + j];
    }
 } 
+printf("%f,%f\n",Feature[0][j],Feature[NumData-1][j]);
 //cout<<"Reading features complete"<<endl;
+
 }
 
 void GMM::Random_Init() // Just use the first # of mixtures features to initialize the centers respectivly
@@ -70,13 +72,13 @@ void GMM::Random_Init() // Just use the first # of mixtures features to initiali
       for (int j=0; j<DIM; j++) 
          Mixtures[i].Mean[j]=Feature[i][j]; // Initialize mean
   
- // for (int i=0; i<Num_Mix; i++)
-     {//printf("Initial mean of mixture %d is: ",i);
-   //   for (int j=0; j<DIM; j++)
-	     //printf("%f ", Mixtures[i].Mean[j]);
-	 // printf ("\n");
+  for (int i=0; i<Num_Mix; i++)
+     {printf("Initial mean of mixture %d is: ",i);
+      for (int j=0; j<DIM; j++)
+	     printf("%f ", Mixtures[i].Mean[j]);
+	  printf ("\n");
 	 }
-  //printf("Mean initialization complete\n");
+  printf("Mean initialization complete\n");
 }
 
 
@@ -263,6 +265,7 @@ void GMM::Iterate()
 	change=Update_Mean(); // Update mean after reclustering
 	iter++;
   }
+  printf( "here ok 2\n");
   Update_variance();
   Update_weight();  
 } 
@@ -331,7 +334,7 @@ void GMM::EM()
 {float change=Infinity;
  int iter=1,i,j;
  //printf("Now, perform EM iterations\n");
- while (change>=threshold_EM)
+ while ((iter<=Max_Iter)&&(change>=threshold_EM))
    {//printf ("EM iteration %d:\n",iter);
     //printf("perform E-step, compute Pr[class|data]\n");
     E_step();  // do E-step
